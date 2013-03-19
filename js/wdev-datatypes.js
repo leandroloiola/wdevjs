@@ -1,10 +1,8 @@
 /**
  * Transforma os campos que possuírem os atributos abaixo:
  *    data-type="text" - Para campos contendo letras e números, bloqueando os caracteres especiais.
- *    data-number-type="..."
- *         "integer" - Para campos contendo apenas números. 
- *         "currency" - Para campos contendo valores monetários que podem ser positivos(+), negativos(-) e conter separador de milhar(.)
- *                      e decimais(,).
+ *    data-type="integer" - Para campos contendo apenas números. 
+ *    data-type="currency" - Para campos contendo valores monetários que podem ser positivos(+), negativos(-) e conter separador de milhar(.) e decimais(,).
  */
 function inicializarPluginDataTypes() {
 	var padrao = {
@@ -18,74 +16,30 @@ function inicializarPluginDataTypes() {
 		var pattern = input.attr('data-type');
 		input.bind('keypress', function(e) {
 			var letter = null;
-			 if (event.which == null) { // Referência http://unixpapa.com/js/key.html
-				 letter = String.fromCharCode(event.keyCode);    // old IE
-			 } else if (event.which != 0 && event.charCode != 0) {
-				  letter = String.fromCharCode(event.which);	  // All others
-			 }
-			 if (!padrao[pattern].test(letter)) {
-				 e.preventDefault();
-				 return false;
-			 }
-		});
-		
-		// Apaga o valor digitado caso não esteja válido
-		input.bind('blur', function() {
-			var original = input.val();
-			// não faz nada se estiver vazio
-			//console.log(original);
-			if (original != "") {
-				// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
-				var value = $.trim(original).replace(/\./, '');
-				// verifica se a expressão está no formato monetário correto
-				var valid = padrao[pattern].test(value);
-				if (valid) {
-					// se o valor tratado estiver válido mas for diferente do valor digitado pelo usuário
-					if (original != value) {
-						// altera o campo e coloca o valor tratado
-						input.val(value);
-					}
-				} else {
-					// apagar se estiver inválido
-					input.val("");
-				}
-			}
-		});
-	});
-	
-	$('input[data-number-type]').each(function() {
-		var input = $(this);
-		var numberType = input.attr('data-number-type');
-		input.bind('keypress', function(e) {
-			var letter = null;
-			
 			if (event.which == null) { // Referência http://unixpapa.com/js/key.html
 				letter = String.fromCharCode(event.keyCode);    // old IE
 			} else if (event.which != 0 && event.charCode != 0) {
 				letter = String.fromCharCode(event.which);	  // All others
 			}
-			
-			if (/[^0-9]/.test(letter)) {
+			 
+			if (!padrao[pattern].test(letter)) {
 				// se o campo for currency, permite os caracteres ",.-"
-				if (numberType == 'currency') {
+				if (pattern == 'currency') {
 					if (letter == ',') {
 						// não permite mais de um caracter ,
 						if (input.val().indexOf(',') == -1) { 
 							return true;
 						}
-						 
-					// permite quantos separadores de milhar forem necessários
 					} else if (letter == '.') { 
+						// permite quantos separadores de milhar forem necessários
 						return true;
-					
-					// permite valores negativos
 					} else if (letter == '-') { 
+						// permite valores negativos
 						if (input.val().indexOf('-') == -1) {
 							return true;
 						}
 					}
 				}
-				
 				e.preventDefault();
 				return false;
 			}
@@ -95,13 +49,11 @@ function inicializarPluginDataTypes() {
 		input.bind('blur', function() {
 			var original = input.val();
 			// não faz nada se estiver vazio
-			
 			if (original != "") {
 				// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
-				var value = $.trim(original).replace(/\./, '');
+				var value = $.trim(original).replace(/\./g, '');
 				// verifica se a expressão está no formato monetário correto
-				var valid = padrao[numberType].test(value);
-				
+				var valid = padrao[pattern].test(value);
 				if (valid) {
 					// se o valor tratado estiver válido mas for diferente do valor digitado pelo usuário
 					if (original != value) {
@@ -170,12 +122,18 @@ function inicializarPluginDataTypes() {
 					  .replace("mm", right("00" + (value.getMonth() + 1), 2))
 					  .replace("yy", right("00" + value.getFullYear(), 4));
 	}
+	
+	var dateTypes = {
+		'botao-calendario': {showOn: 'button', buttonImage: 'css/images/calendar.gif', buttonImageOnly: true}
+		, 'nascimento': {yearRange: 'c-100:c+50'} // Data de nascimento (-100 anos / +50 anos a partir da data atual)
+		, 'pesquisa-futura': {yearRange: 'c-100:c+10'} // Pesquisa futura (-100 anos / +10 anos a partir da data atual)
+	};
 
 	$('input[data-date-type]').each(function() {
 		var input$ = $(this);
 		var dateType = input$.attr('data-date-type') || 'default';
 		
-		var dateConfig = { showButtonPanel: true, onClose: function() {
+		var dateConfig = { showButtonPanel: false, changeMonth: true, changeYear: true, onClose: function() {
 			var date = input$.datepicker("getDate");
 			if (date == null 
 				  // contornar o bug do jQuery UI http://bugs.jqueryui.com/ticket/8009
@@ -196,18 +154,15 @@ function inicializarPluginDataTypes() {
 			}
 		});
 		
+		$.extend(dateConfig, dateTypes[dateType]);
+		
 		switch (dateType) {
-			case "default":
-				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false});
-				break;
 			case "nascimento":
-				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false, yearRange: "c-100:c+50"});
+				$.extend(dateConfig, {});
 				break;
 			case "pesquisa-futura":
-				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false, yearRange: "c-100:c+10"});
+				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false, });
 				break;
-			default:
-				throw new Error("Tipo de data '" + dateType + "' desconhecido'");
 		}
 					
 		input$.datepicker(dateConfig);

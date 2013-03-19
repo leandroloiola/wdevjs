@@ -1,7 +1,9 @@
-/**
+$(document).ready(function() {
+
+	/**
 	 * Conecta um campo SELECT à uma fonte dados através de JSON
 	 * Recebe os parâmetros:
-	 	{
+		{
 			url: "http://url-xyz/@{#id-do-input}/@{.class-do-input}/xx/@{paramName1}/yy/@{paramName2}"
 			, params: { 
 				"paramName1": "paramValue1"
@@ -9,10 +11,8 @@
 					return "paramValue2"
 				}
 			}
-	
-	 	}
-**/
-$(document).ready(function() {
+		}
+	**/
 	var paramRE = /@\{([#\.\w\d-_]+)\}/g;
 	
 	$.Options = {
@@ -138,5 +138,7 @@ $(document).ready(function() {
 				$me.trigger('change.connect');
 			}
 		});
-	}   
+	}
+	
+	 
 });
