@@ -187,4 +187,51 @@ function inicializarPluginDataTypes() {
     });
 }
 
-$(document).ready(inicializarPluginDataTypes);
+
+
+/**
+ * MÉTODO PARA MASCARAR OS CAMPOS TYPE FILE
+ */
+function mascararInputFile(){
+	$("input[type=file]").each(function(){
+		var input = $(this);
+		var name = input.attr('name');
+		var nameFake = name+"Fake";
+		var value = input.val();
+		var inputFake = "<input name='"+nameFake+"' value='"+value+"' /><a href='#' onclick='return false;' id='"+nameFake+"'><img src='css/images/folder.png' height='20' /></a>";
+		
+		input.attr('onkeypress', 'return false;');
+		input.bind('keypress', function(e){
+			e.preventDefault();
+			return false;
+		}).bind('keydown', function(){
+			return false;
+		});
+		
+		input.after(inputFake);
+		input.hide();
+		
+		input.bind('change', function(){
+			$("input[name='"+nameFake+"']").val($(this).val());
+		});
+		
+		$("input[name='"+nameFake+"'], a#"+nameFake+" ").bind('click', function(){
+			input.click();
+		});
+		
+		$("input[name='"+nameFake+"']").attr('onkeypress', 'return false;');
+		$("input[name='"+nameFake+"']").bind('keypress', function(e){
+			e.preventDefault();
+			return false;
+		}).bind('keydown', function(){
+			return false;
+		});
+	});
+}
+
+
+$(document).ready(function(){
+	inicializarPluginDataTypes();
+	
+	mascararInputFile();
+});
