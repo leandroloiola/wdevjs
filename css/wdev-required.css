@@ -1,7 +1,8 @@
 .obrigatorio{
-	color: #FA8072;
+	color: #F00;
+	font-weight: bold;
 }
-
 .required{
-	background: #FA8072;
+	background: #FFDFE0;
+	border: 1px solid #EFC2C4;
 }
