@@ -14,7 +14,7 @@ function inicializarPluginDataTypes() {
 	$('input[data-type]').each(function() {
 		var input = $(this);
 		var pattern = input.attr('data-type');
-		input.bind('keypress', function(e) {
+		input.bind('keypress', function(event) {
 			var letter = null;
 			if (event.which == null) { // Referência http://unixpapa.com/js/key.html
 				letter = String.fromCharCode(event.keyCode);    // old IE
@@ -40,7 +40,7 @@ function inicializarPluginDataTypes() {
 						}
 					}
 				}
-				e.preventDefault();
+				event.preventDefault();
 				return false;
 			}
 		});
