@@ -1,15 +1,11 @@
 /**
  * Adiciona o asteristico para todos os campos obrigatórios e faz sua validação (se foi preenchido):
  */
- 
  $(document).ready(function(){
 	/**
 	 * Adiciona uma div para a listagem dos erros de validação acima do form.
 	 */
 	 $("form").before("<div id='list-errors' style='display: none;'></div>");
-	 
-	 
-	 
 	
 	/**
 	 * Adiciona nos campos obrigatórios um * para indicar sua obrigatoriedade.
@@ -36,7 +32,6 @@
 		});
 	});
 	
-	
 	/**
 	 * Valida se o e-mail é inválido
 	 */
@@ -59,7 +54,6 @@
 			}
 		});
 		
-		
 		input.bind('blur', function(){
 			var value = input.val();
 			
@@ -74,7 +68,6 @@
 		});
 	});
 	
-	
 	/**
 	 * Verifica se os campos com o atributo data-required foram preenchidos.
 	 */
@@ -82,7 +75,6 @@
 		var hasError = false;
 		var listErrors = "";
 		var errors = $("div#list-errors");
-		
 		
 		$("[data-required]").each(function(){
 			var input = $(this);
@@ -110,6 +102,9 @@
 			}
 		});
 		
+		/**
+		 * Verifica se os campos com o atributo data-email="true" estão com o valor no padrão nome@dominio.com
+		 */
 		$("[data-email=true]").each(function(){
 			var input = $(this);
 			var required = input.attr('data-required');
@@ -118,17 +113,18 @@
 			var valueLength = value.length;
 			var emailFilter=/^.+@.+\..{2,}$/;
 			var illegalChars= /[\(\)\<\>\,\;\:\\\/\"\[\]]/
-				
-			if(!(emailFilter.test(value))||value.match(illegalChars)){
-				input.addClass('required');
-				listErrors += "<li>" + required + " é inválido.</li>";
-				hasError = true;
-			} else {
-				input.removeClass('required');
+			
+			if(value != '') {
+				if(!(emailFilter.test(value))||value.match(illegalChars)){
+					input.addClass('required');
+					listErrors += "<li>" + required + " é inválido.</li>";
+					hasError = true;
+				} else {
+					input.removeClass('required');
+				}
 			}
 		});
 		
-			
 		if(hasError){
 			errors.show();
 			errors.html(listErrors);

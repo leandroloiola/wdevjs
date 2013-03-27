@@ -80,7 +80,8 @@ function inicializarPluginDataTypes() {
 		, 'cpf': {mask: '999.999.999-99'}
 		, 'cep': {mask: '99999-999'}
 		, 'telefone': {mask: '(99) 9999-9999'}
-		, 'telefone-nono-digito': {mask: '(99) 99999-9999'}
+		, 'celular': {mask: '(99) 9999-9999'}
+		, 'celular-nono-digito': {mask: '(99) 99999-9999'}
 	};
 	
 	function boolean(value, defaultValue) {
@@ -100,9 +101,9 @@ function inicializarPluginDataTypes() {
 			opcoesMascara = {mask: mascara, autoUnmask: boolean($input.attr('data-autounmask'), true) };
 		}
 		
-		if(mascara == 'telefone' && $.trim($input.val()) != '') {
+		if(mascara == 'celular' && $.trim($input.val()) != '') {
 			if($input.val().length > 8) {
-				opcoesMascara = mascaras['telefone-nono-digito'];
+				opcoesMascara = mascaras['celular-nono-digito'];
 			}
 		}
 		
@@ -113,19 +114,21 @@ function inicializarPluginDataTypes() {
 		}
 		
 		$input.bind('keyup', function(){
-			var value = $input.val();
-			var ddd = "";
-			
-			if(value.length >= 2){
-				ddd = value.substring(0,2);
-			}
-			
-			if(ddd == "11"){
-				opcoesMascara = mascaras['telefone-nono-digito'];
-				$input.inputmask(opcoesMascara.mask, opcoesMascara);
-			} else {
-				opcoesMascara = mascaras['telefone'];
-				$input.inputmask(opcoesMascara.mask, opcoesMascara);
+			if(mascara == 'celular') {
+				var value = $input.val();
+				var ddd = "";
+				
+				if(value.length >= 2){
+					ddd = value.substring(0,2);
+				}
+				
+				if(ddd == "11"){
+					opcoesMascara = mascaras['celular-nono-digito'];
+					$input.inputmask(opcoesMascara.mask, opcoesMascara);
+				} else {
+					opcoesMascara = mascaras['celular'];
+					$input.inputmask(opcoesMascara.mask, opcoesMascara);
+				}
 			}
 		});
 	});
