@@ -7,11 +7,13 @@
 		<script type="text/javascript" src="js/vendor/jquery.inputmask.js"></script>
 		<script type="text/javascript" src="js/vendor/jquery-ui.custom.min.js"></script>
 		<script type="text/javascript" src="js/vendor/jquery.ui.datepicker-pt-BR.js"></script>
+		<script type="text/javascript" src="js/vendor/jquery.blockUI.js"></script>
 		
 		<!-- External styles -->
 		<link rel="stylesheet" type="text/css" href="css/jquery-ui.min.css" />
 		
 		<!-- WDEV plugins -->
+		<script type="text/javascript" src="js/wdev-block.js"></script>
 		<script type="text/javascript" src="js/wdev-datatypes.js"></script>
 		<script type="text/javascript" src="js/wdev-ajax.js"></script>
 		<script type="text/javascript" src="js/wdev-required.js"></script>
@@ -44,6 +46,8 @@
 			
 			<p>Telefone: <input type="text" data-mask="telefone" /></p>
 			
+			<p>Celular (considerando 9º dígito para DDD 11): <input type="text" data-mask="celular" /></p>
+			
 			<p>Contagem textarea: <textarea maxlength="400"></textarea></p>
 			
 			<p>Input File: <input type="file" name="anexo" /></p>
@@ -57,7 +61,9 @@
 			
 			<p><label for="obrigatorio">Obrigatório:</label> <input type="text" name="obrigatorio" data-required="Teste obrigatoriedade" /></p>
 			
-			<p><label for="email">Validação E-mail:</label> <input type="text" name="email" data-required="Validação E-mail" data-email="true" /></p>
+			<p><label for="email">E-mail:</label> <input type="text" name="email" data-required="E-mail da pessoa" data-type="email" /></p>
+			
+			<p><label for="email2">E-mail sem obrigatoriedade:</label> <input type="text" name="email2" data-type="email" /></p>
 			
 			<p>
 				<label for="estado">Teste Combo:</label>
@@ -86,6 +92,22 @@
 			
 			<input name="submit" type="submit" value="Submit" />
 		</form>
+		
+		<h3>Bloqueio Ajax</h3>
+		<input type="button" id="botao-ajax" value="Enviar"/>
+		<script>
+			$(document).ready(function(){
+				$('#botao-ajax').click(function(){
+					$.callAjax({url: 'http://www.malsup.com/jquery/block/wait.php'});
+				});
+				
+				// No submit ainda não está fazendo, pois esta conflitando com a validação de campos 
+				//$('form').submit(function(){
+				//	$.blockUI({ message: '<h2>Aguarde carregando...</h2><img src="css/images/carregando.gif"/>' });
+				//});
+			});
+		</script>
+		
 		</div>
 	</body>
 </html>

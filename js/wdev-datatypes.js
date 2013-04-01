@@ -9,20 +9,41 @@ function inicializarPluginDataTypes() {
 		'currency': /^[+-]?[0-9]{1,3}(?:\.?[0-9]{3})*(?:\,[0-9]+)?$/
 		, 'integer': /^\d*?$/
 		, 'text': /^[\dA-Za-z]*$/
+		, 'email': /^[\._A-Za-z0-9-+@]$/
 	};
+	
+	var caracteresIlegaisEmail = /[\(\)\<\>\,\;\:\\\/\"\[\]]/;
+	
+	var caracteresPermitidos = {
+		BACKSPACE: 8, COMMAND_LEFT: 91, COMMAND_RIGHT: 93, CONTROL: 17, DELETE: 46, 
+		DOWN: 40, END: 35, ENTER: 13, ESCAPE: 27, HOME: 36, LEFT: 37, 
+		RIGHT: 39, SHIFT: 16, SPACE: 32, TAB: 9, UP: 38
+	}
+	
+	function permiteCaractere(caractere) {
+		var encontrou = false;
+		$.each(caracteresPermitidos, function(key, value){
+			if(caractere == value) {
+				encontrou = true;
+				return;
+			}
+		});
+		return encontrou;
+	}
 	
 	$('input[data-type]').each(function() {
 		var input = $(this);
 		var pattern = input.attr('data-type');
-		input.bind('keypress', function(e) {
-			var letter = null;
-			if (event.which == null) { // Referência http://unixpapa.com/js/key.html
-				letter = String.fromCharCode(event.keyCode);    // old IE
-			} else if (event.which != 0 && event.charCode != 0) {
-				letter = String.fromCharCode(event.which);	  // All others
+		input.bind('keypress', function(event) {
+			event = event || window.event;
+			var letter = event.which || event.charCode || event.keyCode;
+			if(event.ctrlKey || event.altKey || event.metaKey || permiteCaractere(letter)) {
+				return true;
 			}
+			
+			letter = String.fromCharCode(letter);
 			 
-			if (!padrao[pattern].test(letter)) {
+			if ($.trim(letter) != '' && !padrao[pattern].test(letter)) {
 				// se o campo for currency, permite os caracteres ",.-"
 				if (pattern == 'currency') {
 					if (letter == ',') {
@@ -40,18 +61,40 @@ function inicializarPluginDataTypes() {
 						}
 					}
 				}
-				e.preventDefault();
+				event.preventDefault();
 				return false;
+			}
+			
+			//valida se o e-mail é valido
+			if(input.val() || input.val() > 5 && pattern == 'email'){
+				var value = input.val();
+				var emailFilter=/^[_A-Za-z0-9-+]([._A-Za-z0-9-]+)*@[A-Za-z0-9-]+([A-Za-z0-9]+)(\.[A-Za-z]{2,}){1,2}$/;
+				var label = $("label[for="+input.attr('name')+"]");
+				var idError = 'required-'+input.attr('name');
+				var spanError = "<span id='"+idError+"' class='span-required'><br/>Preenchimento obrigatório</span>";
+				var spanInvalido = "<span id='"+idError+"' class='span-required'><br/>"+label.text().replace(":", "").replace("*", "")+" inválido</span>";
+				
+				if(!emailFilter.test(value)){
+					input.addClass('required');	
+					$("#"+idError).remove();
+					input.after(spanInvalido);
+				} else {
+					input.removeClass('required');
+					$("#"+idError).remove();
+				}
 			}
 		});
 		
 		// Apaga o valor digitado caso não esteja válido
 		input.bind('blur', function() {
 			var original = input.val();
-			// não faz nada se estiver vazio
-			if (original != "") {
-				// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
-				var value = $.trim(original).replace(/\./g, '');
+			// não faz nada se estiver vazio e for diferente do e-mail (ATENÇÃO: e-mail tem uma validação a parte)
+			if (original != "" && pattern != 'email') {
+				var value = $.trim(original);
+				if (pattern == 'currency') {
+					// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
+					value = value.replace(/\./g, '');
+				}
 				// verifica se a expressão está no formato monetário correto
 				var valid = padrao[pattern].test(value);
 				if (valid) {
@@ -63,6 +106,23 @@ function inicializarPluginDataTypes() {
 				} else {
 					// apagar se estiver inválido
 					input.val("");
+				}
+			} else if(original && pattern == 'email'){ //valida se o e-mail é valido
+				console.log("validação email");
+				var value = input.val();
+				var emailFilter=/^[_A-Za-z0-9-+]([._A-Za-z0-9-]+)*@[A-Za-z0-9-]+([A-Za-z0-9]+)(\.[A-Za-z]{2,}){1,2}$/;
+				var label = $("label[for="+input.attr('name')+"]");
+				var idError = 'required-'+input.attr('name');
+				var spanError = "<span id='"+idError+"' class='span-required'><br/>Preenchimento obrigatório</span>";
+				var spanInvalido = "<span id='"+idError+"' class='span-required'><br/>"+label.text().replace(":", "").replace("*", "")+" inválido</span>";
+				
+				if(!emailFilter.test(value)){
+					input.addClass('required');	
+					$("#"+idError).remove();
+					input.after(spanInvalido);
+				} else {
+					input.removeClass('required');
+					$("#"+idError).remove();
 				}
 			}
 		});
@@ -80,7 +140,8 @@ function inicializarPluginDataTypes() {
 		, 'cpf': {mask: '999.999.999-99'}
 		, 'cep': {mask: '99999-999'}
 		, 'telefone': {mask: '(99) 9999-9999'}
-		, 'telefone-nono-digito': {mask: '(99) 99999-9999'}
+		, 'celular': {mask: '(99) 9999-9999'}
+		, 'celular-nono-digito': {mask: '(99) 99999-9999'}
 	};
 	
 	function boolean(value, defaultValue) {
@@ -100,9 +161,9 @@ function inicializarPluginDataTypes() {
 			opcoesMascara = {mask: mascara, autoUnmask: boolean($input.attr('data-autounmask'), true) };
 		}
 		
-		if(mascara == 'telefone' && $.trim($input.val()) != '') {
+		if(mascara == 'celular' && $.trim($input.val()) != '') {
 			if($input.val().length > 8) {
-				opcoesMascara = mascaras['telefone-nono-digito'];
+				opcoesMascara = mascaras['celular-nono-digito'];
 			}
 		}
 		
@@ -113,19 +174,21 @@ function inicializarPluginDataTypes() {
 		}
 		
 		$input.bind('keyup', function(){
-			var value = $input.val();
-			var ddd = "";
-			
-			if(value.length >= 2){
-				ddd = value.substring(0,2);
-			}
-			
-			if(ddd == "11"){
-				opcoesMascara = mascaras['telefone-nono-digito'];
-				$input.inputmask(opcoesMascara.mask, opcoesMascara);
-			} else {
-				opcoesMascara = mascaras['telefone'];
-				$input.inputmask(opcoesMascara.mask, opcoesMascara);
+			if(mascara == 'celular') {
+				var value = $input.val();
+				var ddd = "";
+				
+				if(value.length >= 2){
+					ddd = value.substring(0,2);
+				}
+				
+				if(ddd == "11"){
+					opcoesMascara = mascaras['celular-nono-digito'];
+					$input.inputmask(opcoesMascara.mask, opcoesMascara);
+				} else {
+					opcoesMascara = mascaras['celular'];
+					$input.inputmask(opcoesMascara.mask, opcoesMascara);
+				}
 			}
 		});
 	});
