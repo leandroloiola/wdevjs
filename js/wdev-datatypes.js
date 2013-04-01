@@ -9,20 +9,42 @@ function inicializarPluginDataTypes() {
 		'currency': /^[+-]?[0-9]{1,3}(?:\.?[0-9]{3})*(?:\,[0-9]+)?$/
 		, 'integer': /^\d*?$/
 		, 'text': /^[\dA-Za-z]*$/
+		, 'email': /^[\._A-Za-z0-9-+@]+$/
 	};
+	
+	var caracteresIlegaisEmail = /[\(\)\<\>\,\;\:\\\/\"\[\]]/;
+	
+	var caracteresPermitidos = {
+		BACKSPACE: 8, COMMAND_LEFT: 91, COMMAND_RIGHT: 93, CONTROL: 17, DELETE: 46, 
+		DOWN: 40, END: 35, ENTER: 13, ESCAPE: 27, HOME: 36, LEFT: 37, 
+		RIGHT: 39, SHIFT: 16, SPACE: 32, TAB: 9, UP: 38
+	}
+	
+	function permiteCaractere(caractere) {
+		var encontrou = false;
+		$.each(caracteresPermitidos, function(key, value){
+			if(caractere == value) {
+				encontrou = true;
+				return;
+			}
+		});
+		return encontrou;
+	}
 	
 	$('input[data-type]').each(function() {
 		var input = $(this);
 		var pattern = input.attr('data-type');
 		input.bind('keypress', function(event) {
-			var letter = null;
-			if (event.which == null) { // Referência http://unixpapa.com/js/key.html
-				letter = String.fromCharCode(event.keyCode);    // old IE
-			} else if (event.which != 0 && event.charCode != 0) {
-				letter = String.fromCharCode(event.which);	  // All others
+			event = event || window.event;
+			var letter = event.which || event.charCode || event.keyCode;
+			
+			if(event.ctrlKey || event.altKey || event.metaKey || permiteCaractere(letter)) {
+				return true;
 			}
+			
+			letter = String.fromCharCode(letter);
 			 
-			if (!padrao[pattern].test(letter)) {
+			if ($.trim(letter) != '' && !padrao[pattern].test(letter)) {
 				// se o campo for currency, permite os caracteres ",.-"
 				if (pattern == 'currency') {
 					if (letter == ',') {
@@ -50,8 +72,11 @@ function inicializarPluginDataTypes() {
 			var original = input.val();
 			// não faz nada se estiver vazio
 			if (original != "") {
-				// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
-				var value = $.trim(original).replace(/\./g, '');
+				var value = $.trim(original);
+				if (pattern == 'currency') {
+					// remove os separadores de milhar para evitar erros desnecessários (ATENÇÃO: verificar se realmente é interessante fazer isso)
+					value = value.replace(/\./g, '');
+				}
 				// verifica se a expressão está no formato monetário correto
 				var valid = padrao[pattern].test(value);
 				if (valid) {

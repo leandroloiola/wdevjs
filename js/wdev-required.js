@@ -33,42 +33,6 @@
 	});
 	
 	/**
-	 * Valida se o e-mail é inválido
-	 */
-	$("[data-email=true]").each(function(){
-		var input = $(this);
-		
-		input.bind('keypress', function(){
-			var value = input.val();
-			var valueLength = value.length;
-			
-			if(valueLength >= 7){
-				var emailFilter=/^.+@.+\..{2,}$/;
-				var illegalChars= /[\(\)\<\>\,\;\:\\\/\"\[\]]/
-				
-				if(!(emailFilter.test(value))||value.match(illegalChars)){
-					input.addClass('required');
-				} else {
-					input.removeClass('required');
-				}
-			}
-		});
-		
-		input.bind('blur', function(){
-			var value = input.val();
-			
-			var emailFilter=/^.+@.+\..{2,}$/;
-			var illegalChars= /[\(\)\<\>\,\;\:\\\/\"\[\]]/
-			
-			if(!(emailFilter.test(value))||value.match(illegalChars)){
-				input.addClass('required');
-			} else {
-				input.removeClass('required');
-			}
-		});
-	});
-	
-	/**
 	 * Verifica se os campos com o atributo data-required foram preenchidos.
 	 */
 	 $("form").submit(function(){
@@ -103,21 +67,19 @@
 		});
 		
 		/**
-		 * Verifica se os campos com o atributo data-email="true" estão com o valor no padrão nome@dominio.com
+		 * Verifica se os campos com o atributo data-type=email estão com o valor no padrão nome@dominio.com
 		 */
-		$("[data-email=true]").each(function(){
+		$("[data-type=email]").each(function(){
 			var input = $(this);
-			var required = input.attr('data-required');
 		
 			var value = input.val();
 			var valueLength = value.length;
-			var emailFilter=/^.+@.+\..{2,}$/;
-			var illegalChars= /[\(\)\<\>\,\;\:\\\/\"\[\]]/
+			var emailFilter=/^[_A-Za-z0-9-+]([._A-Za-z0-9-]+)*@[A-Za-z0-9-]+([A-Za-z0-9]+)(\.[A-Za-z]{2,}){1,2}$/;
 			
 			if(value != '') {
-				if(!(emailFilter.test(value))||value.match(illegalChars)){
+				if(!emailFilter.test(value)){
 					input.addClass('required');
-					listErrors += "<li>" + required + " é inválido.</li>";
+					listErrors += "<li>Email é inválido.</li>";
 					hasError = true;
 				} else {
 					input.removeClass('required');

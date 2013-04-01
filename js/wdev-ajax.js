@@ -1,6 +1,22 @@
 $(document).ready(function() {
 
 	/**
+	 * Faz uma chamada ajax ja preenchendo determinadas opcoes por padrao, como bloquear a tela
+	 */
+	$.callAjax = function(options){
+		var defaults = {
+			beforeSend: function(jqXHR) {
+				jqXHR.overrideMimeType("text/html;charset=iso-8859-1");
+				$.blockUI({ message: '<h2>Aguarde carregando...</h2><img src="css/images/carregando.gif"/>' });
+			}
+		};
+		
+		$.extend(defaults, options);
+		
+		$.ajax(defaults);
+	};
+
+	/**
 	 * Conecta um campo SELECT à uma fonte dados através de JSON
 	 * Recebe os parâmetros:
 		{
