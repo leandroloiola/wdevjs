@@ -70,8 +70,11 @@
 						input.addClass('required');
 						listErrors += "<li>" + required + " é obrigatório</li>";
 						hasError = true;
-						$("#"+idError).remove();
-						input.after(spanError);
+						console.log(type);
+						if(type != "checkbox" && type != "radio" && type != undefined){
+							$("#"+idError).remove();
+							input.after(spanError);
+						}
 					}
 				} else {
 					input.removeClass('required');
