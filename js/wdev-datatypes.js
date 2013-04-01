@@ -240,7 +240,7 @@ function inicializarPluginDataTypes() {
 				$.extend(dateConfig, {});
 				break;
 			case "pesquisa-futura":
-				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false, });
+				$.extend(dateConfig, {changeMonth: true, changeYear: true, showButtonPanel: false});
 				break;
 		}
 					
