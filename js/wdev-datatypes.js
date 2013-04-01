@@ -107,8 +107,7 @@ function inicializarPluginDataTypes() {
 					// apagar se estiver inválido
 					input.val("");
 				}
-			} else if(original && pattern == 'email'){ //valida se o e-mail é valido
-				console.log("validação email");
+			} else if(pattern == 'email'){ //valida se o e-mail é valido
 				var value = input.val();
 				var emailFilter=/^[_A-Za-z0-9-+]([._A-Za-z0-9-]+)*@[A-Za-z0-9-]+([A-Za-z0-9]+)(\.[A-Za-z]{2,}){1,2}$/;
 				var label = $("label[for="+input.attr('name')+"]");
@@ -116,7 +115,7 @@ function inicializarPluginDataTypes() {
 				var spanError = "<span id='"+idError+"' class='span-required'><br/>Preenchimento obrigatório</span>";
 				var spanInvalido = "<span id='"+idError+"' class='span-required'><br/>"+label.text().replace(":", "").replace("*", "")+" inválido</span>";
 				
-				if(!emailFilter.test(value)){
+				if(value && !emailFilter.test(value)){
 					input.addClass('required');	
 					$("#"+idError).remove();
 					input.after(spanInvalido);
