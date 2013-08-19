@@ -66,7 +66,7 @@ function inicializarPluginDataTypes() {
 			}
 			
 			//valida se o e-mail é valido
-			if(input.val() || input.val() > 5 && pattern == 'email'){
+			if((input.val() || input.val() > 5) && pattern == 'email') {
 				var value = input.val();
 				var emailFilter=/^[_A-Za-z0-9-+]([._A-Za-z0-9-]+)*@[A-Za-z0-9-]+([A-Za-z0-9]+)(\.[A-Za-z]{2,}){1,2}$/;
 				var label = $("label[for="+input.attr('name')+"]");
